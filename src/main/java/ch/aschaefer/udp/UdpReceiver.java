@@ -39,13 +39,13 @@ public class UdpReceiver implements Runnable {
     }
 
     public void run() {
-        try {
+        try (DatagramSocket serverSocket = new DatagramSocket(port)) {
             LOG.info("wait for packages");
             while (run && !Thread.currentThread().isInterrupted()) {
                 LOG.trace("wait for package");
                 byte[] data = new byte[packetSize];
                 DatagramPacket packet = new DatagramPacket(data, packetSize);
-                try (DatagramSocket serverSocket = new DatagramSocket(port)) {
+                try {
                     serverSocket.setBroadcast(true);
                     serverSocket.setSoTimeout(500);
                     serverSocket.receive(packet);
