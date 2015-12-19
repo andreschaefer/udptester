@@ -9,35 +9,24 @@
 
 <!-- Bootstrap -->
 <link href="css/bootstrap.min.css" rel="stylesheet"/>
+<link href="css/udp.css" rel="stylesheet"/>
 </head>
 <body>
+<nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+    <div class="container">
+        <div class="navbar-brand">UDP Monitor</div>
+    </div>
+</nav>
 <div class="container">
 
-    <h1>UDP-Test-Client</h1>
 
     <h2>Empfangen:</h2>
-<pre id="received">
-</pre>
+    <pre id="received"></pre>
+
 </div>
 
-
-<div>
-    <div>
-        <button id="connect" onclick="connect();">Connect</button>
-        <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
-    </div>
-    <div id="conversationDiv">
-        <label>What is your name?</label><input type="text" id="name"/>
-        <button id="sendName" onclick="sendName();">Send</button>
-        <p id="response"></p>
-    </div>
-</div>
-
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="js/jquery-2.1.4.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="js/bootstrap.js"></script>
-
 <script src="js/sockjs.min.js"></script>
 <script src="js/stomp.min.js"></script>
 <script type="text/javascript">
@@ -50,10 +39,12 @@
             stompClient.heartbeat.outgoing = 2000;
             stompClient.heartbeat.incoming = 2000;
             stompClient.connect({}, function (frame) {
-//                console.log('Connected: ' + frame);
                 stompClient.subscribe('/topic/receive', function (message) {
                     if (message.body) {
-                        $('#received').append(message.body + "\n");
+                        var datagram = JSON.parse(message.body);
+                        var log =  datagram.source + " : " + datagram.hex + "\n";
+                        $('#received').append(log);
+                        window.scrollTo(0,document.body.scrollHeight);
                     }
                 });
             });
@@ -63,7 +54,6 @@
             if (stompClient != null) {
                 stompClient.disconnect();
             }
-//            console.log("Disconnected");
         }
 
         connect();

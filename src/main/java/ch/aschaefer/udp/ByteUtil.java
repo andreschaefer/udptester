@@ -19,7 +19,7 @@ public class ByteUtil {
 
         String hex = new String(hexChars);
         if (hex.endsWith(":")) {
-            hex = hex.substring(0, hex.length() - 2);
+            hex = hex.substring(0, hex.length() - 1);
         }
         return hex;
     }

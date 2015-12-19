@@ -1,9 +1,6 @@
 package ch.aschaefer.udp;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +17,7 @@ public class UdpReceiver implements Runnable {
     private boolean run = true;
     private int packetSize = 20;
     private int port = 10000;
-    private Consumer<String> processor = System.out::println;
+    private Consumer<Datagram> processor = System.out::println;
     private Consumer<String> error = System.err::println;
 
     public static void main(String[] args) {
@@ -48,7 +45,8 @@ public class UdpReceiver implements Runnable {
                 DatagramPacket packet = new DatagramPacket(data, packetSize);
                 serverSocket.receive(packet);
                 data = packet.getData();
-                processor.accept(toHex(data));
+                Datagram datagram = new Datagram(packet.getData(), packet.getSocketAddress().toString(), packet.getAddress().toString());
+                processor.accept(datagram);
             }
         } catch (Exception e) {
             error.accept("UDP Server error:" + e.getMessage());
@@ -82,11 +80,11 @@ public class UdpReceiver implements Runnable {
         this.port = port;
     }
 
-    public Consumer<String> getProcessor() {
+    public Consumer<Datagram> getProcessor() {
         return processor;
     }
 
-    public void setProcessor(Consumer<String> processor) {
+    public void setProcessor(Consumer<Datagram> processor) {
         this.processor = processor;
     }
 
