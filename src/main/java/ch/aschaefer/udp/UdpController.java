@@ -3,7 +3,10 @@ package ch.aschaefer.udp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
+
+import javax.inject.Inject;
 
 /**
  * @author aschaefer
@@ -13,8 +16,22 @@ import org.springframework.stereotype.Controller;
 public class UdpController {
     private static final Logger LOG = LoggerFactory.getLogger(UdpController.class);
 
-    @MessageMapping("/udp")
-    public void udp() throws Exception {
-        LOG.debug("connected");
+    protected final UdpMessageDispatcher dispatcher;
+
+    @Inject
+    public UdpController(UdpMessageDispatcher dispatcher) {
+        this.dispatcher = dispatcher;
+    }
+
+    @MessageMapping("/start")
+    public void start(@Payload int port) throws Exception {
+        LOG.debug("Request start port {}", port);
+        dispatcher.start(port);
+    }
+
+    @MessageMapping("/stop")
+    public void stop() throws Exception {
+        LOG.debug("Request stop");
+        dispatcher.stop();
     }
 }

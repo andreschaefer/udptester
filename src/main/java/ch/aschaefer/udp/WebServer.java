@@ -23,20 +23,4 @@ public class WebServer {
         SpringApplication.run(WebServer.class, args);
     }
 
-
-    @Autowired
-    protected SimpMessagingTemplate messagingTemplate;
-
-    @Bean
-    public UdpReceiver udpReceiver() {
-        UdpReceiver receiver = new UdpReceiver();
-        receiver.setProcessor(message -> {
-            LOG.debug("dispatch {}", message);
-            messagingTemplate.convertAndSend("/topic/receive", message);
-        });
-        receiver.setError(LOG::debug);
-        ExecutorService executor = Executors.newFixedThreadPool(5);
-        executor.submit(receiver);
-        return receiver;
-    }
 }

@@ -1,24 +1,27 @@
 package ch.aschaefer.udp;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-
-import static ch.aschaefer.udp.ByteUtil.toHex;
 
 /**
  * Created by René Schäfer on 10.10.2015.
  */
 public class UdpReceiver implements Runnable {
 
+    private static final Logger LOG = LoggerFactory.getLogger(UdpReceiver.class);
+
     private boolean run = true;
     private int packetSize = 20;
     private int port = 10000;
     private Consumer<Datagram> processor = System.out::println;
-    private Consumer<String> error = System.err::println;
 
     public static void main(String[] args) {
         int port = 10000;
@@ -37,22 +40,24 @@ public class UdpReceiver implements Runnable {
 
     public void run() {
         try {
-            DatagramSocket serverSocket = new DatagramSocket(port);
-            serverSocket.setBroadcast(true);
-            while (run) {
-                error.accept("wait for package");
+            LOG.info("wait for packages");
+            while (run && !Thread.currentThread().isInterrupted()) {
+                LOG.trace("wait for package");
                 byte[] data = new byte[packetSize];
                 DatagramPacket packet = new DatagramPacket(data, packetSize);
-                serverSocket.receive(packet);
-                data = packet.getData();
-                Datagram datagram = new Datagram(packet.getData(), packet.getSocketAddress().toString(), packet.getAddress().toString());
-                processor.accept(datagram);
+                try (DatagramSocket serverSocket = new DatagramSocket(port)) {
+                    serverSocket.setBroadcast(true);
+                    serverSocket.setSoTimeout(500);
+                    serverSocket.receive(packet);
+                    Datagram datagram = new Datagram(packet.getData(), packet.getSocketAddress().toString(), packet.getAddress().toString());
+                    processor.accept(datagram);
+                } catch (SocketTimeoutException e) {
+                    LOG.trace("Timeout, allow interrupt");
+                }
             }
         } catch (Exception e) {
-            error.accept("UDP Server error:" + e.getMessage());
-            e.printStackTrace();
+            LOG.error("UDP Server error: {}", e.getMessage(), e);
         }
-
     }
 
 
@@ -88,11 +93,11 @@ public class UdpReceiver implements Runnable {
         this.processor = processor;
     }
 
-    public Consumer<String> getError() {
-        return error;
-    }
 
-    public void setError(Consumer<String> error) {
-        this.error = error;
+    @Override
+    public String toString() {
+        return "UdpReceiver{" +
+                "port=" + port +
+                '}';
     }
 }

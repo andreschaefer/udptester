@@ -15,6 +15,15 @@
 <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
     <div class="container">
         <div class="navbar-brand">UDP Monitor</div>
+        <form class="navbar-form navbar-left">
+            <div class="input-group">
+
+                <span class="input-group-addon">Port</span>
+                <input type="text" id="port" name="port" class="form-control" value="10000">
+            </div>
+            <button type="button" class="btn btn-default" data-action="start">Start</button>
+            <button type="button" class="btn btn-default" data-action="stop">Stop</button>
+        </form>
     </div>
 </nav>
 <div class="container">
@@ -26,38 +35,43 @@
 </div>
 
 <script src="js/jquery-2.1.4.js"></script>
-<script src="js/bootstrap.js"></script>
+<script src="js/bootstrap.min.js"></script>
 <script src="js/sockjs.min.js"></script>
 <script src="js/stomp.min.js"></script>
 <script type="text/javascript">
-    $(document).ready(function () {
-        var stompClient = null;
+    var stompClient = null;
 
-        function connect() {
-            var socket = new SockJS('/udp');
-            stompClient = Stomp.over(socket);
-            stompClient.heartbeat.outgoing = 2000;
-            stompClient.heartbeat.incoming = 2000;
-            stompClient.connect({}, function (frame) {
-                stompClient.subscribe('/topic/receive', function (message) {
-                    if (message.body) {
-                        var datagram = JSON.parse(message.body);
-                        var log =  datagram.source + " : " + datagram.hex + "\n";
-                        $('#received').append(log);
-                        window.scrollTo(0,document.body.scrollHeight);
-                    }
-                });
+    function connect() {
+        var socket = new SockJS('/udp');
+        stompClient = Stomp.over(socket);
+        stompClient.heartbeat.outgoing = 2000;
+        stompClient.heartbeat.incoming = 2000;
+        stompClient.connect({}, function (frame) {
+            stompClient.subscribe('/topic/receive', function (message) {
+                if (message.body) {
+                    var datagram = JSON.parse(message.body);
+                    var log = datagram.hex + "\n";
+                    $('#received').append(log);
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
             });
-        }
+        });
+    }
 
-        function disconnect() {
-            if (stompClient != null) {
-                stompClient.disconnect();
-            }
+    function disconnect() {
+        if (stompClient != null) {
+            stompClient.disconnect();
         }
+    }
 
+    $(document).ready(function () {
         connect();
-
+        $('[data-action="start"]').on("click", function () {
+            stompClient.send("/udp/start", {}, $('[name="port"]').val());
+        });
+        $('[data-action="stop"]').on("click", function () {
+            stompClient.send("/udp/stop", {});
+        })
     });
 
 </script>
