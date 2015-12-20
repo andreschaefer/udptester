@@ -1,6 +1,7 @@
 # UDP Tester
 
 ![Build Status](https://api.travis-ci.org/andreschaefer/udptester.svg)
+[Download Binaries](https://github.com/andreschaefer/udptester/releases)
 
 ## Features
 
