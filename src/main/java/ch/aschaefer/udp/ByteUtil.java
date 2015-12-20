@@ -39,6 +39,9 @@ public class ByteUtil {
      * @return hex string representation in format AA:FF:47:11
      */
     public static String toHex(byte[] bytes) {
+        if (bytes == null) {
+            return "";
+        }
         char[] hexChars = new char[bytes.length * 3];
         for (int j = 0; j < bytes.length; j++) {
             int v = bytes[j] & 0xFF;
