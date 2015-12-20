@@ -1,5 +1,7 @@
 # UDP Tester
 
+![Build Status](https://api.travis-ci.org/andreschaefer/udptester.svg)
+
 ## Features
 
 - Simple command line UDP receiver
