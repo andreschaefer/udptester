@@ -2,11 +2,14 @@ package ch.aschaefer.udp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.net.DatagramPacket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,16 +21,24 @@ import java.util.concurrent.Executors;
 public class UdpMessageDispatcher {
     private static final Logger LOG = LoggerFactory.getLogger(UdpMessageDispatcher.class);
 
-    @Autowired
-    protected SimpMessagingTemplate messagingTemplate;
+    protected final SimpMessagingTemplate messagingTemplate;
+    protected final Converter<DatagramPacket, ControlMessage> converter;
 
     protected final ExecutorService executor = Executors.newFixedThreadPool(2);
 
     protected UdpReceiver receiver;
 
+    @Inject
+    public UdpMessageDispatcher(SimpMessagingTemplate messagingTemplate,
+                                @Named("datagramSocketToControlMessageConverter") Converter<DatagramPacket, ControlMessage> converter) {
+        this.messagingTemplate = messagingTemplate;
+        this.converter = converter;
+    }
+
     public UdpReceiver udpReceiver(int port) {
         UdpReceiver receiver = new UdpReceiver();
-        receiver.setProcessor(message -> {
+        receiver.setProcessor(packet -> {
+            ControlMessage message = converter.convert(packet);
             messagingTemplate.convertAndSend("/topic/receive", message);
         });
         receiver.setPort(port);

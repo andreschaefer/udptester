@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+import static ch.aschaefer.udp.ByteUtil.toHex;
+
 /**
  * Created by René Schäfer on 10.10.2015.
  */
@@ -21,7 +23,8 @@ public class UdpReceiver implements Runnable {
     private boolean run = true;
     private int packetSize = 20;
     private int port = 10000;
-    private Consumer<Datagram> processor = System.out::println;
+    private Consumer<DatagramPacket> processor = packet -> System.out.println(toHex(packet.getData()));
+    ;
 
     public static void main(String[] args) {
         int port = 10000;
@@ -49,8 +52,7 @@ public class UdpReceiver implements Runnable {
                     serverSocket.setBroadcast(true);
                     serverSocket.setSoTimeout(500);
                     serverSocket.receive(packet);
-                    Datagram datagram = new Datagram(packet.getData(), packet.getSocketAddress().toString(), packet.getAddress().toString());
-                    processor.accept(datagram);
+                    processor.accept(packet);
                 } catch (SocketTimeoutException e) {
                     LOG.trace("Timeout, allow interrupt");
                 }
@@ -85,11 +87,11 @@ public class UdpReceiver implements Runnable {
         this.port = port;
     }
 
-    public Consumer<Datagram> getProcessor() {
+    public Consumer<DatagramPacket> getProcessor() {
         return processor;
     }
 
-    public void setProcessor(Consumer<Datagram> processor) {
+    public void setProcessor(Consumer<DatagramPacket> processor) {
         this.processor = processor;
     }
 
