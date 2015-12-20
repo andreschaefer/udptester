@@ -1,1 +1,1 @@
-java -jar testclient.jar ch.aschaefer.udp.UdpSender %*
+java -jar udptester.jar
