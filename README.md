@@ -8,8 +8,11 @@
 - Simple command line UDP receiver
 - Simple command line UDP sender
 - Advanced Webserver with websocket based UDP sender / receiver
- 
+
 ## Run binaries
+
+Java 8 is required to run the applications. 
+http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
  
 ### Command line receiver
 
