@@ -2,3 +2,10 @@ body {
     padding-top: 70px;
 }
 
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
