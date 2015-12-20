@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<link>
-<meta charset="utf-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-<title>UDP Broadcast Testclient</title>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>UDP Broadcast Testclient</title>
 
-<!-- Bootstrap -->
-<link href="css/bootstrap.min.css" rel="stylesheet"/>
-<link href="css/udp.css" rel="stylesheet"/>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/udp.css" rel="stylesheet"/>
 </head>
 <body>
 <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
@@ -22,21 +22,46 @@
     </div>
 </nav>
 <div class="container">
-    <div class="row">
-        <div class="col-sm-12">
-            <form class="form-inline">
-                <div class="input-group">
-                    <span class="input-group-addon">Port</span>
-                    <input type="text" id="port" name="port" class="form-control" value="10000">
-                </div>
-                <button type="button" class="btn btn-default" data-action="start">Start</button>
-                <button type="button" class="btn btn-default" data-action="stop">Stop</button>
-            </form>
+    <div class="receive">
+        <div class="row">
+            <div class="col-sm-12">
+                <form class="form-inline">
+                    <div class="input-group">
+                        <span class="input-group-addon">Port</span>
+                        <input type="text" id="receive-port" name="receive-port" class="form-control" value="10000">
+                    </div>
+                    <button type="button" class="btn btn-default" data-action="start">Start</button>
+                    <button type="button" class="btn btn-default" data-action="stop">Stop</button>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <pre id="received"></pre>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <pre id="received" class="margin-bt"></pre>
+    <div class="send">
+        <div class="row">
+            <div class="col-sm-12">
+                <form>
+                    <div class="control-group">
+                        <label class="control-label">Host / IP</label>
+                        <input type="text" id="send-ip" name="send-ip" class="form-control" value="127.0.0.1">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Port</label>
+                        <input type="text" id="send-port" name="send-port" class="form-control form-control-small"
+                               value="10000">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Message (hex)</label>
+                        <input type="text" id="send-message" name="send-message" class="form-control"
+                               placeholder="AA:FF:00">
+                    </div>
+                    <button type="button" class="btn btn-default" data-action="send">Send</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -74,12 +99,23 @@
 
     $(document).ready(function () {
         connect();
-        $('[data-action="start"]').on("click", function () {
-            stompClient.send("/udp/start", {}, $('[name="port"]').val());
+        $('[data-action="start"]').on("click", function (e) {
+            e.preventDefault();
+            stompClient.send("/udp/start", {}, $('[name="receive-port"]').val());
         });
-        $('[data-action="stop"]').on("click", function () {
+        $('[data-action="stop"]').on("click", function (e) {
+            e.preventDefault();
             stompClient.send("/udp/stop", {});
-        })
+        });
+        $('[data-action="send"]').on("click", function (e) {
+            e.preventDefault();
+            var payload = {
+                "targetHost": $('#send-ip').val(),
+                "targetPort": $('#send-port').val(),
+                "hex": $('#send-message').val()
+            };
+            stompClient.send("/udp/send", {}, JSON.stringify(payload));
+        });
     });
 
 </script>

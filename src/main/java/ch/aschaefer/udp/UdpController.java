@@ -34,4 +34,10 @@ public class UdpController {
         LOG.debug("Request stop");
         dispatcher.stop();
     }
+
+    @MessageMapping("/send")
+    public void send(@Payload ControlMessage message) throws Exception {
+        LOG.debug("Send {}", message);
+        UdpSender.send(message.getTargetHost(), message.getTargetPort(), message.getHex());
+    }
 }

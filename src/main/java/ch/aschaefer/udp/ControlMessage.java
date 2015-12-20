@@ -1,10 +1,5 @@
 package ch.aschaefer.udp;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-import static ch.aschaefer.udp.ByteUtil.toHex;
-
 /**
  * @author aschaefer
  * @since 19.12.15.
@@ -13,7 +8,8 @@ public class ControlMessage {
     private String hex;
     private String timestamp;
     private String source;
-    private String target;
+    private String targetHost;
+    private int targetPort = 10000;
 
 
     public String getHex() {
@@ -29,16 +25,21 @@ public class ControlMessage {
         return source;
     }
 
-    public String getTarget() {
-        return target;
+    public String getTargetHost() {
+        return targetHost;
     }
 
-
+    public int getTargetPort() {
+        return targetPort;
+    }
 
     @Override
     public String toString() {
-        return "Datagram{" +
+        return "ControlMessage{" +
                 "hex='" + hex + '\'' +
+                ", source='" + source + '\'' +
+                ", targetHost='" + targetHost + '\'' +
+                ", targetPort=" + targetPort +
                 '}';
     }
 
@@ -60,12 +61,12 @@ public class ControlMessage {
         return this;
     }
 
-    public void setTarget(String target) {
-        this.target = target;
+    public void setTargetHost(String targetHost) {
+        this.targetHost = targetHost;
     }
 
-    public ControlMessage target(String target) {
-        setTarget(target);
+    public ControlMessage targetHost(String targetHost) {
+        setTargetHost(targetHost);
         return this;
     }
 
@@ -75,6 +76,15 @@ public class ControlMessage {
 
     public ControlMessage timestamp(String timestamp) {
         setTimestamp(timestamp);
+        return this;
+    }
+
+    public void setTargetPort(int targetPort) {
+        this.targetPort = targetPort;
+    }
+
+    public ControlMessage targetPort(int targetPort) {
+        setTargetPort(targetPort);
         return this;
     }
 }

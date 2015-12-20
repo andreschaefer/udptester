@@ -21,6 +21,8 @@ public class DatagramSocketToControlMessageConverter implements Converter<Datagr
                 .timestamp(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now()))
                 .hex(toHex(source.getData()))
                 .source(source.getSocketAddress().toString())
-                .target(source.getAddress().toString());
+                .targetHost(source.getAddress().getHostAddress())
+                .targetPort(source.getPort())
+                ;
     }
 }
