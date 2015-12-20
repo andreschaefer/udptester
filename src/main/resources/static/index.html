@@ -15,22 +15,30 @@
 <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
     <div class="container">
         <div class="navbar-brand">UDP Monitor</div>
-        <form class="navbar-form navbar-left">
-            <div class="input-group">
-
-                <span class="input-group-addon">Port</span>
-                <input type="text" id="port" name="port" class="form-control" value="10000">
-            </div>
-            <button type="button" class="btn btn-default" data-action="start">Start</button>
-            <button type="button" class="btn btn-default" data-action="stop">Stop</button>
-        </form>
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="#receive">Enpfangen</a></li>
+            <li><a href="#send">Senden</a></li>
+        </ul>
     </div>
 </nav>
 <div class="container">
-
-
-    <h2>Empfangen:</h2>
-    <pre id="received"></pre>
+    <div class="row">
+        <div class="col-sm-12">
+            <form class="form-inline">
+                <div class="input-group">
+                    <span class="input-group-addon">Port</span>
+                    <input type="text" id="port" name="port" class="form-control" value="10000">
+                </div>
+                <button type="button" class="btn btn-default" data-action="start">Start</button>
+                <button type="button" class="btn btn-default" data-action="stop">Stop</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <pre id="received" class="margin-bt"></pre>
+        </div>
+    </div>
 
 </div>
 
